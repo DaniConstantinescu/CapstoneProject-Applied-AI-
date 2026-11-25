@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="300" height="450">
+  <defs>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#000" stop-opacity="0.4"/>
+      <stop offset="5%" stop-color="#fff" stop-opacity="0.2"/>
+      <stop offset="10%" stop-color="#000" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="450" fill="#4a4e69" rx="4"/>
+  <rect width="300" height="450" fill="url(#spine)" rx="4"/>
+  <rect x="20" y="20" width="260" height="410" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <text x="150" y="160" font-family="'IBM Plex Sans', sans-serif" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" width="240">
+    <tspan x="150" dy="0">Silent Witness of Prague</tspan>
+  </text>
+  <line x1="100" y1="230" x2="200" y2="230" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2"/>
+  <text x="150" y="280" font-family="'IBM Plex Sans', sans-serif" font-size="16" fill="#e0e0e0" text-anchor="middle">
+    Arjun Patel
+  </text>
+  <text x="150" y="400" font-family="'IBM Plex Sans', sans-serif" font-size="12" fill="#a0a0a0" text-anchor="middle" letter-spacing="2">
+    BOOK WORM
+  </text>
+</svg>
