@@ -39,7 +39,7 @@ export default function OrderConfirmationPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading purchase confirmation..." />
       </div>
     );
@@ -47,7 +47,7 @@ export default function OrderConfirmationPage() {
 
   if (!order) {
     return (
-      <div style={{ textAlign: 'center', padding: '4rem' }}>
+      <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
         <h2>Order Confirmation Not Found</h2>
         <p style={{ marginTop: '1rem' }}>
           <Link href="/">Return to Home</Link>
@@ -58,9 +58,9 @@ export default function OrderConfirmationPage() {
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '3rem' }}>
-      <Tile style={{ textAlign: 'center', padding: '3rem 2rem', backgroundColor: '#262626', marginBottom: '2rem' }}>
+      <Tile className="hero-tile" style={{ backgroundColor: '#262626', marginBottom: '2rem' }}>
         <CheckmarkFilled size={48} style={{ color: '#42be65', marginBottom: '1rem' }} />
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#f4f4f4', marginBottom: '0.5rem' }}>
+        <h1 className="page-title" style={{ marginBottom: '0.5rem' }}>
           Thank you! Your purchase is successful.
         </h1>
         <p style={{ color: '#c6c6c6', fontSize: '1rem', marginBottom: '0.5rem' }}>
@@ -79,17 +79,12 @@ export default function OrderConfirmationPage() {
         {order.items.map((item, idx) => (
           <Tile
             key={idx}
-            style={{
-              backgroundColor: '#262626',
-              padding: '1.25rem',
-              display: 'flex',
-              gap: '1.25rem',
-              alignItems: 'center',
-            }}
+            className="line-item"
+            style={{ backgroundColor: '#262626', padding: '1.25rem' }}
           >
             <div
+              className="line-item__cover"
               style={{
-                width: '70px',
                 aspectRatio: '2 / 3',
                 borderRadius: '4px',
                 overflow: 'hidden',
@@ -106,7 +101,7 @@ export default function OrderConfirmationPage() {
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.25rem' }}>
+              <div className="tag-row" style={{ marginBottom: '0.25rem' }}>
                 <Tag size="sm" type="cool-gray">
                   {item.book.category.name}
                 </Tag>
@@ -128,14 +123,14 @@ export default function OrderConfirmationPage() {
               </div>
             </div>
 
-            <div style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f4f4f4' }}>
+            <div className="line-item__aside" style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f4f4f4' }}>
               {formatPrice(item.unitPriceCents * item.quantity)}
             </div>
           </Tile>
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div className="action-row action-row--center">
         <Link href="/" passHref legacyBehavior>
           <Button size="lg">Continue your Shopping</Button>
         </Link>

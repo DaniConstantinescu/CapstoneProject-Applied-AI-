@@ -19,12 +19,12 @@ export function AddressForm({ address, onChange, errors = {} }: AddressFormProps
   };
 
   return (
-    <Tile style={{ padding: '1.5rem', backgroundColor: '#262626' }}>
+    <Tile className="responsive-tile" style={{ backgroundColor: '#262626' }}>
       <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', color: '#f4f4f4' }}>
         Delivery Address
       </h3>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+      <div className="form-grid form-grid--2" style={{ marginBottom: '1rem' }}>
         <TextInput
           id="address-first-name"
           labelText="First Name"
@@ -45,7 +45,7 @@ export function AddressForm({ address, onChange, errors = {} }: AddressFormProps
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+      <div className="form-grid form-grid--2" style={{ marginBottom: '1rem' }}>
         <TextInput
           id="address-phone"
           labelText="Phone Number"
@@ -80,7 +80,7 @@ export function AddressForm({ address, onChange, errors = {} }: AddressFormProps
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+      <div className="form-grid form-grid--3">
         <TextInput
           id="address-city"
           labelText="City"

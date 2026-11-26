@@ -122,7 +122,7 @@ export default function BookDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading book details..." />
       </div>
     );
@@ -130,7 +130,7 @@ export default function BookDetailPage() {
 
   if (!book) {
     return (
-      <div style={{ textAlign: 'center', padding: '4rem' }}>
+      <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
         <h2>Book Not Found</h2>
         <p style={{ marginTop: '1rem' }}>
           <Link href="/">Return to Catalogue</Link>
@@ -163,9 +163,9 @@ export default function BookDetailPage() {
       )}
 
       {/* 3-Column Layout: Cover | Details | Related Reads */}
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr 300px', gap: '2rem', alignItems: 'flex-start' }}>
+      <div className="book-detail-layout">
         {/* Column 1: Book Cover */}
-        <div>
+        <div className="book-detail-cover">
           <Tile style={{ padding: '0.75rem', backgroundColor: '#262626' }}>
             <div
               style={{
@@ -187,8 +187,8 @@ export default function BookDetailPage() {
         </div>
 
         {/* Column 2: Main Details & Actions */}
-        <div>
-          <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ minWidth: 0 }}>
+          <div className="tag-row" style={{ marginBottom: '0.75rem', gap: '0.5rem', alignItems: 'center' }}>
             <Tag size="md" type="cool-gray">
               {book.category.name}
             </Tag>
@@ -197,7 +197,7 @@ export default function BookDetailPage() {
             </Tag>
           </div>
 
-          <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '0.5rem', color: '#f4f4f4' }}>
+          <h1 className="page-title" style={{ marginBottom: '0.5rem' }}>
             {book.title}
           </h1>
 
@@ -221,7 +221,7 @@ export default function BookDetailPage() {
           </Tile>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+          <div className="book-actions">
             <Button
               renderIcon={ShoppingCart}
               onClick={handleAddToCart}
@@ -253,17 +253,17 @@ export default function BookDetailPage() {
 
           {/* About the Writer */}
           {book.author.bio && (
-            <Tile style={{ backgroundColor: '#262626', padding: '1.5rem' }}>
+            <Tile className="responsive-tile" style={{ backgroundColor: '#262626' }}>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
                 About the Writer
               </h3>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <div className="author-bio">
                 {book.author.photoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={book.author.photoUrl}
                     alt={book.author.name}
-                    style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }}
+                    style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
                   />
                 )}
                 <div>
@@ -280,11 +280,11 @@ export default function BookDetailPage() {
         </div>
 
         {/* Column 3: Related Reads (max 4) */}
-        <div>
+        <div className="book-detail-related">
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', color: '#f4f4f4' }}>
             Related Reads
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="book-detail-related__list">
             {related.length > 0 ? (
               related.map((rb) => (
                 <BookCard key={rb.id} book={rb} />

@@ -63,7 +63,7 @@ export default function CartCheckoutPage() {
 
   if (loading && !cart) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading shopping cart..." />
       </div>
     );
@@ -81,12 +81,12 @@ export default function CartCheckoutPage() {
         <BreadcrumbItem isCurrentPage>Checkout</BreadcrumbItem>
       </Breadcrumb>
 
-      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '2rem', color: '#f4f4f4' }}>
+      <h1 className="page-title" style={{ marginBottom: '1.5rem' }}>
         Shopping Cart & Checkout
       </h1>
 
       {isEmpty ? (
-        <Tile style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#262626' }}>
+        <Tile className="hero-tile" style={{ backgroundColor: '#262626' }}>
           <ShoppingCart size={48} style={{ color: '#8d8d8d', marginBottom: '1rem' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
             Your shopping cart is empty
@@ -99,25 +99,20 @@ export default function CartCheckoutPage() {
           </Link>
         </Tile>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem', alignItems: 'flex-start' }}>
+        <div className="two-col-layout">
           {/* Left Column: Cart Items & Address Form */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: 0 }}>
             {/* Cart Items List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {cart.items.map((item) => (
                 <Tile
                   key={item.book.id}
-                  style={{
-                    backgroundColor: '#262626',
-                    padding: '1.25rem',
-                    display: 'flex',
-                    gap: '1.25rem',
-                    alignItems: 'center',
-                  }}
+                  className="line-item"
+                  style={{ backgroundColor: '#262626', padding: '1.25rem' }}
                 >
                   <div
+                    className="line-item__cover"
                     style={{
-                      width: '80px',
                       aspectRatio: '2 / 3',
                       borderRadius: '4px',
                       overflow: 'hidden',
@@ -134,7 +129,7 @@ export default function CartCheckoutPage() {
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.25rem' }}>
+                    <div className="tag-row" style={{ marginBottom: '0.25rem' }}>
                       <Tag size="sm" type="cool-gray">
                         {item.book.category.name}
                       </Tag>
@@ -158,7 +153,7 @@ export default function CartCheckoutPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                  <div className="line-item__aside">
                     <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f4f4f4' }}>
                       {formatPrice(item.lineTotalCents)}
                     </div>
@@ -180,7 +175,7 @@ export default function CartCheckoutPage() {
           </div>
 
           {/* Right Column: Order Summary Breakdown */}
-          <Tile style={{ backgroundColor: '#262626', padding: '1.5rem', position: 'sticky', top: '70px' }}>
+          <Tile className="sticky-summary responsive-tile" style={{ backgroundColor: '#262626' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', color: '#f4f4f4' }}>
               Order Summary
             </h2>

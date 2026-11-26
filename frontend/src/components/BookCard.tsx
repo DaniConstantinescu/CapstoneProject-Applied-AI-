@@ -8,7 +8,7 @@ import { formatPrice, formatDeliveryBy } from '../lib/formatters';
 
 export function BookCard({ book }: { book: Book }) {
   return (
-    <Tile className="clickable-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1rem' }}>
+    <Tile className="clickable-card book-card">
       <Link href={`/books/${book.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div
           style={{
@@ -42,20 +42,7 @@ export function BookCard({ book }: { book: Book }) {
           </Tag>
         </div>
 
-        <h3
-          style={{
-            fontSize: '1.125rem',
-            fontWeight: 600,
-            marginBottom: '0.25rem',
-            color: '#f4f4f4',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            lineHeight: 1.3,
-            minHeight: '2.6rem',
-          }}
-        >
+        <h3 className="book-card__title">
           {book.title}
         </h3>
       </Link>
@@ -66,23 +53,12 @@ export function BookCard({ book }: { book: Book }) {
         </Link>
       </div>
 
-      <p
-        style={{
-          fontSize: '0.8125rem',
-          color: '#a8a8a8',
-          marginBottom: '1rem',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          flex: 1,
-        }}
-      >
+      <p className="book-card__desc">
         {book.description}
       </p>
 
       <div style={{ marginTop: 'auto', borderTop: '1px solid #393939', paddingTop: '0.75rem' }}>
-        <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f4f4f4', marginBottom: '0.25rem' }}>
+        <div className="book-card__price">
           {formatPrice(book.priceCents)}
         </div>
         <div style={{ fontSize: '0.75rem', color: '#6f6f6f' }}>

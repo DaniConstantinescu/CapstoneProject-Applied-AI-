@@ -80,7 +80,7 @@ export default function WishlistPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading wishlist..." />
       </div>
     );
@@ -88,7 +88,7 @@ export default function WishlistPage() {
 
   return (
     <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '1.5rem', color: '#f4f4f4' }}>
+      <h1 className="page-title" style={{ marginBottom: '1.5rem' }}>
         My Wishlist
       </h1>
 
@@ -103,7 +103,7 @@ export default function WishlistPage() {
       )}
 
       {items.length === 0 ? (
-        <Tile style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#262626' }}>
+        <Tile className="hero-tile" style={{ backgroundColor: '#262626' }}>
           <Favorite size={48} style={{ color: '#8d8d8d', marginBottom: '1rem' }} />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
             Your wishlist is empty
@@ -116,13 +116,13 @@ export default function WishlistPage() {
           </Link>
         </Tile>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px, 100%), 1fr))', gap: '1.25rem' }}>
           {items.map((book) => (
             <Tile
               key={book.id}
+              className="responsive-tile"
               style={{
                 backgroundColor: '#262626',
-                padding: '1.25rem',
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -147,7 +147,7 @@ export default function WishlistPage() {
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.25rem' }}>
+                  <div className="tag-row" style={{ marginBottom: '0.25rem' }}>
                     <Tag size="sm" type="cool-gray">
                       {book.category.name}
                     </Tag>

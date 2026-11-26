@@ -101,36 +101,17 @@ function CatalogueContent() {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-      {/* Left Category Sidebar */}
-      <aside
-        style={{
-          width: '220px',
-          flexShrink: 0,
-          backgroundColor: '#262626',
-          borderRadius: '4px',
-          padding: '1.25rem',
-        }}
-      >
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', color: '#f4f4f4' }}>
-          Categories
-        </h3>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ marginBottom: '0.5rem' }}>
+    <div className="catalogue-layout">
+      {/* Category Sidebar (horizontal chip row on phones) */}
+      <aside className="catalogue-sidebar" aria-label="Categories">
+        <h3 className="catalogue-sidebar__title">Categories</h3>
+        <ul className="catalogue-sidebar__list">
+          <li>
             <button
+              type="button"
               onClick={() => updateParam('categoryId', undefined)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: !categoryId ? '#78a9ff' : '#c6c6c6',
-                fontWeight: !categoryId ? 600 : 400,
-                cursor: 'pointer',
-                textAlign: 'left',
-                width: '100%',
-                padding: '0.375rem 0.5rem',
-                borderRadius: '4px',
-                backgroundColor: !categoryId ? '#393939' : 'transparent',
-              }}
+              className={`catalogue-sidebar__item${!categoryId ? ' catalogue-sidebar__item--active' : ''}`}
+              aria-pressed={!categoryId}
             >
               All Categories
             </button>
@@ -138,21 +119,12 @@ function CatalogueContent() {
           {categories.map((cat) => {
             const isSelected = categoryId === cat.id;
             return (
-              <li key={cat.id} style={{ marginBottom: '0.25rem' }}>
+              <li key={cat.id}>
                 <button
+                  type="button"
                   onClick={() => updateParam('categoryId', String(cat.id))}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: isSelected ? '#78a9ff' : '#c6c6c6',
-                    fontWeight: isSelected ? 600 : 400,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    width: '100%',
-                    padding: '0.375rem 0.5rem',
-                    borderRadius: '4px',
-                    backgroundColor: isSelected ? '#393939' : 'transparent',
-                  }}
+                  className={`catalogue-sidebar__item${isSelected ? ' catalogue-sidebar__item--active' : ''}`}
+                  aria-pressed={isSelected}
                 >
                   {cat.name}
                 </button>
@@ -163,18 +135,10 @@ function CatalogueContent() {
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="catalogue-main">
         {/* Toolbar */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
-            marginBottom: '2rem',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ flex: '1 1 300px' }}>
+        <div className="catalogue-toolbar">
+          <div className="catalogue-toolbar__search">
             <form onSubmit={handleSearchSubmit}>
               <Search
                 id="search-books"
@@ -190,7 +154,7 @@ function CatalogueContent() {
             </form>
           </div>
 
-          <div style={{ width: '200px' }}>
+          <div className="catalogue-toolbar__select">
             <Select
               id="author-filter"
               labelText="Author"
@@ -205,7 +169,7 @@ function CatalogueContent() {
             </Select>
           </div>
 
-          <div style={{ width: '200px' }}>
+          <div className="catalogue-toolbar__select">
             <Select
               id="sort-select"
               labelText="Sort By"
@@ -229,7 +193,7 @@ function CatalogueContent() {
           <>
             {/* Recommended for You section (unfiltered home only) */}
             {!isFiltered && recommendations.length > 0 && (
-              <div style={{ marginBottom: '3rem' }}>
+              <div style={{ marginBottom: '2.5rem' }}>
                 <BookGrid books={recommendations} title="Recommended for You" />
               </div>
             )}

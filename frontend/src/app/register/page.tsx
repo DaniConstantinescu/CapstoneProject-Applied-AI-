@@ -54,7 +54,7 @@ function RegisterForm() {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-      <Tile style={{ width: '100%', maxWidth: '440px', padding: '2rem' }}>
+      <Tile className="form-tile" style={{ width: '100%', maxWidth: '440px' }}>
         <h2 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 600 }}>Create an Account</h2>
 
         {error && (

@@ -26,17 +26,11 @@ export function BookGrid({
   return (
     <div>
       {title && (
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.25rem', color: '#f4f4f4' }}>
+        <h2 className="book-grid-title">
           {title}
         </h2>
       )}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: '1.25rem',
-        }}
-      >
+      <div className="book-grid">
         {books.map((book) => (
           <BookCard key={book.id} book={book} />
         ))}

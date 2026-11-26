@@ -58,7 +58,7 @@ export default function OrderHistoryPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading order history..." />
       </div>
     );
@@ -66,7 +66,7 @@ export default function OrderHistoryPage() {
 
   return (
     <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '1.5rem', color: '#f4f4f4' }}>
+      <h1 className="page-title" style={{ marginBottom: '1.5rem' }}>
         My Orders
       </h1>
 
@@ -81,7 +81,7 @@ export default function OrderHistoryPage() {
       )}
 
       {orders.length === 0 ? (
-        <Tile style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#262626' }}>
+        <Tile className="hero-tile" style={{ backgroundColor: '#262626' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
             No orders placed yet
           </h2>
@@ -97,9 +97,9 @@ export default function OrderHistoryPage() {
           {orders.map((order) => (
             <Tile
               key={order.id}
+              className="responsive-tile"
               style={{
                 backgroundColor: '#262626',
-                padding: '1.5rem',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
@@ -117,7 +117,7 @@ export default function OrderHistoryPage() {
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f4f4f4', marginRight: '1rem' }}>
+                  <span style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f4f4f4', marginRight: '1rem', display: 'inline-block' }}>
                     Order #{order.id}
                   </span>
                   <span style={{ fontSize: '0.875rem', color: '#a8a8a8' }}>
@@ -133,7 +133,7 @@ export default function OrderHistoryPage() {
               </div>
 
               {/* Items Thumbnails */}
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {order.items.map((item, idx) => (
                   <div
                     key={idx}
@@ -144,6 +144,8 @@ export default function OrderHistoryPage() {
                       backgroundColor: '#161616',
                       padding: '0.375rem 0.75rem',
                       borderRadius: '4px',
+                      maxWidth: '100%',
+                      minWidth: 0,
                     }}
                   >
                     <div
@@ -153,6 +155,7 @@ export default function OrderHistoryPage() {
                         borderRadius: '2px',
                         overflow: 'hidden',
                         backgroundColor: '#262626',
+                        flexShrink: 0,
                       }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -162,7 +165,7 @@ export default function OrderHistoryPage() {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     </div>
-                    <span style={{ fontSize: '0.875rem', color: '#f4f4f4' }}>
+                    <span style={{ fontSize: '0.875rem', color: '#f4f4f4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {item.title} ({item.quantity})
                     </span>
                   </div>
@@ -170,7 +173,7 @@ export default function OrderHistoryPage() {
               </div>
 
               {/* Actions */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem' }}>
+              <div className="action-row action-row--end" style={{ marginTop: '0.5rem' }}>
                 <Link href={`/orders/${order.id}`} passHref legacyBehavior>
                   <Button kind="tertiary" size="sm">
                     View Order Details

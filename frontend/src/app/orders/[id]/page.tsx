@@ -92,7 +92,7 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center' }}>
+      <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
         <InlineLoading description="Loading order details..." />
       </div>
     );
@@ -100,7 +100,7 @@ export default function OrderDetailPage() {
 
   if (!order) {
     return (
-      <div style={{ textAlign: 'center', padding: '4rem' }}>
+      <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
         <h2>Order Not Found</h2>
         <p style={{ marginTop: '1rem' }}>
           <Link href="/orders">Return to Orders</Link>
@@ -123,7 +123,7 @@ export default function OrderDetailPage() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 600, color: '#f4f4f4', marginBottom: '0.25rem' }}>
+          <h1 className="page-title" style={{ marginBottom: '0.25rem' }}>
             Order #{order.id}
           </h1>
           <p style={{ color: '#a8a8a8', fontSize: '0.875rem' }}>
@@ -131,7 +131,7 @@ export default function OrderDetailPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="tag-row" style={{ gap: '0.5rem', alignItems: 'center' }}>
           <OrderStatusTag status={order.status} size="lg" />
           <Tag size="lg" type={order.paymentStatus === 'paid' ? 'green' : 'red'}>
             Payment: {order.paymentStatus === 'paid' ? 'Paid' : 'Refunded'}
@@ -149,11 +149,11 @@ export default function OrderDetailPage() {
         />
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem', alignItems: 'flex-start' }}>
+      <div className="two-col-layout">
         {/* Left Column: Items & Shipping Address */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: 0 }}>
           {/* Purchased Items */}
-          <Tile style={{ backgroundColor: '#262626', padding: '1.5rem' }}>
+          <Tile className="responsive-tile" style={{ backgroundColor: '#262626' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f4f4f4', marginBottom: '1.25rem' }}>
               Items in Order ({order.itemCount} items)
             </h2>
@@ -199,7 +199,7 @@ export default function OrderDetailPage() {
                     </div>
                   </div>
 
-                  <div style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f4f4f4' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: 600, color: '#f4f4f4', whiteSpace: 'nowrap' }}>
                     {formatPrice(item.unitPriceCents * item.quantity)}
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default function OrderDetailPage() {
           </Tile>
 
           {/* Delivery Address Snapshot */}
-          <Tile style={{ backgroundColor: '#262626', padding: '1.5rem' }}>
+          <Tile className="responsive-tile" style={{ backgroundColor: '#262626' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f4f4f4', marginBottom: '1rem' }}>
               Delivery Details
             </h2>
@@ -231,7 +231,7 @@ export default function OrderDetailPage() {
 
         {/* Right Column: Pricing Breakdown & Order Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <Tile style={{ backgroundColor: '#262626', padding: '1.5rem' }}>
+          <Tile className="responsive-tile" style={{ backgroundColor: '#262626' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.25rem', color: '#f4f4f4' }}>
               Payment Summary
             </h2>
