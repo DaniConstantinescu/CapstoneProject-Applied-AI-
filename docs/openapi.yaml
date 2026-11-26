@@ -1,0 +1,1069 @@
+openapi: 3.0.3
+info:
+  title: Book Worm E-Bookstore API
+  description: REST API specification for the physical e-bookstore Proof of Concept (PoC).
+  version: 1.0.0
+servers:
+  - url: /api
+    description: Base API path proxied to Express backend
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new customer account and set auth cookie
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created successfully and logged in
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: token=jwt_token_here; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  error:
+                    code: EMAIL_TAKEN
+                    message: An account with this email already exists
+
+  /auth/login:
+    post:
+      summary: Authenticate user credentials and set auth cookie
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successfully authenticated
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: token=jwt_token_here; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  error:
+                    code: INVALID_CREDENTIALS
+                    message: Invalid email or password
+
+  /auth/logout:
+    post:
+      summary: Clear authentication cookie
+      tags: [Auth]
+      responses:
+        '204':
+          description: Logged out successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0
+
+  /auth/me:
+    get:
+      summary: Get currently authenticated user profile
+      tags: [Auth]
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /categories:
+    get:
+      summary: List all product categories ordered by sort_order
+      tags: [Catalogue]
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+
+  /authors:
+    get:
+      summary: List all authors ordered by name for filter dropdown
+      tags: [Catalogue]
+      responses:
+        '200':
+          description: List of authors
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuthorSummary'
+
+  /books:
+    get:
+      summary: Search, filter, and sort catalogue books
+      tags: [Catalogue]
+      parameters:
+        - name: q
+          in: query
+          description: Search term matching title or author name (case-insensitive)
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: categoryId
+          in: query
+          description: Filter by category ID
+          required: false
+          schema:
+            type: integer
+        - name: authorId
+          in: query
+          description: Filter by author ID
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: Sort ordering
+          required: false
+          schema:
+            type: string
+            enum: [relevance, price_asc, price_desc, title_asc]
+            default: relevance
+      responses:
+        '200':
+          description: Matching books
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /books/{id}:
+    get:
+      summary: Retrieve single book detail
+      tags: [Catalogue]
+      security:
+        - CookieAuth: []
+        - {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Book details including author bio and wishlist status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /books/{id}/related:
+    get:
+      summary: Get up to 4 related books from the same category
+      tags: [Catalogue]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Related books
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /recommendations:
+    get:
+      summary: Get personalized recommendations (or seed fallback)
+      tags: [Catalogue]
+      security:
+        - CookieAuth: []
+        - {}
+      responses:
+        '200':
+          description: Recommended books (up to 10)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+
+  /cart:
+    get:
+      summary: Retrieve current user's shopping cart and computed totals
+      tags: [Cart]
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Cart content and calculated totals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /cart/items:
+    post:
+      summary: Add or increment a book in the shopping cart
+      tags: [Cart]
+      security:
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bookId]
+              properties:
+                bookId:
+                  type: integer
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 999
+                  default: 1
+      responses:
+        '200':
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /cart/items/{bookId}:
+    put:
+      summary: Set exact quantity for a book in cart (0 removes item)
+      tags: [Cart]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 0
+                  maximum: 999
+      responses:
+        '200':
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /wishlist:
+    get:
+      summary: List user's wishlist books (newest first)
+      tags: [Wishlist]
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Wishlist items
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /wishlist/items:
+    post:
+      summary: Add book to wishlist (idempotent)
+      tags: [Wishlist]
+      security:
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bookId]
+              properties:
+                bookId:
+                  type: integer
+      responses:
+        '200':
+          description: Updated wishlist items
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /wishlist/items/{bookId}:
+    delete:
+      summary: Remove book from wishlist (idempotent)
+      tags: [Wishlist]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Removed from wishlist
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /wishlist/items/{bookId}/move-to-cart:
+    post:
+      summary: Move book from wishlist to cart (increments cart by 1, removes from wishlist)
+      tags: [Wishlist]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated cart after moving item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders:
+    post:
+      summary: Checkout cart and complete mock payment in single transaction
+      tags: [Orders]
+      security:
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '201':
+          description: Order placed and mock payment completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '409':
+          description: Cart is empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  error:
+                    code: CART_EMPTY
+                    message: Cannot checkout with an empty shopping cart
+    get:
+      summary: Get order history for current user (newest first)
+      tags: [Orders]
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: List of user orders
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderSummary'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /orders/{id}:
+    get:
+      summary: Get complete order detail by ID
+      tags: [Orders]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{id}/cancel:
+    post:
+      summary: Cancel order within 48h window (sets status to Cancelled and payment to refunded)
+      tags: [Orders]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cancelled order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Order cannot be cancelled (window expired or already cancelled)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                example:
+                  error:
+                    code: CANCELLATION_NOT_ALLOWED
+                    message: Order cancellation window (48 hours) has expired or order is already cancelled
+
+  /orders/{id}/buy-again:
+    post:
+      summary: Add all items from a previous order into the current cart
+      tags: [Orders]
+      security:
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Updated cart with re-ordered items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: JWT authentication token stored in httpOnly cookie
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Jane Doe
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: jane@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          example: password123
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: demo@bookworm.local
+        password:
+          type: string
+          example: demo12345
+
+    User:
+      type: object
+      required: [id, name, email, createdAt]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Jane Doe
+        email:
+          type: string
+          example: jane@example.com
+        createdAt:
+          type: string
+          format: date-time
+
+    UserResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+
+    Category:
+      type: object
+      required: [id, name, sortOrder]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Science Fiction
+        sortOrder:
+          type: integer
+          example: 0
+
+    AuthorSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Daniel Reed
+
+    AuthorDetail:
+      type: object
+      required: [id, name, bio, photoUrl]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Daniel Reed
+        bio:
+          type: string
+          nullable: true
+          example: Daniel Reed is an acclaimed author of speculative fiction.
+        photoUrl:
+          type: string
+          nullable: true
+          example: /covers/authors/daniel-reed.png
+
+    Book:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - format
+        - priceCents
+        - coverUrl
+        - publisher
+        - author
+        - category
+        - estimatedDeliveryDate
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: The Joy of Minimalism
+        description:
+          type: string
+          example: A comprehensive guide to decluttering your home, work, and mind.
+        format:
+          type: string
+          enum: [Paperback, Hardcover]
+          example: Paperback
+        priceCents:
+          type: integer
+          description: Price in EUR cents
+          example: 1999
+        coverUrl:
+          type: string
+          example: /covers/joy-of-minimalism.png
+        publisher:
+          type: string
+          example: Vintage Books
+        author:
+          $ref: '#/components/schemas/AuthorSummary'
+        category:
+          type: object
+          required: [id, name]
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: Self-help
+        estimatedDeliveryDate:
+          type: string
+          format: date
+          example: '2025-08-15'
+
+    BookDetail:
+      allOf:
+        - $ref: '#/components/schemas/Book'
+        - type: object
+          required: [author, inWishlist]
+          properties:
+            author:
+              $ref: '#/components/schemas/AuthorDetail'
+            inWishlist:
+              type: boolean
+              example: false
+
+    CartItem:
+      type: object
+      required: [book, quantity, lineTotalCents]
+      properties:
+        book:
+          $ref: '#/components/schemas/Book'
+        quantity:
+          type: integer
+          example: 2
+        lineTotalCents:
+          type: integer
+          example: 3998
+
+    Cart:
+      type: object
+      required:
+        - items
+        - itemCount
+        - itemsTotalCents
+        - taxIncludedCents
+        - shippingCents
+        - totalCents
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        itemCount:
+          type: integer
+          description: Sum of item quantities
+          example: 2
+        itemsTotalCents:
+          type: integer
+          description: Sum of item prices (tax included)
+          example: 3998
+        taxIncludedCents:
+          type: integer
+          description: Calculated tax portion already included in itemsTotalCents
+          example: 330
+        shippingCents:
+          type: integer
+          description: Shipping fee in cents (0 = free)
+          example: 0
+        totalCents:
+          type: integer
+          description: Total payable cents (itemsTotalCents + shippingCents)
+          example: 3998
+
+    ShippingAddress:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - phone
+        - address
+        - city
+        - postalCode
+        - state
+        - country
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Jane
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Doe
+        phone:
+          type: string
+          pattern: '^\+?[0-9 ()-]{6,20}$'
+          example: '+353 87 123 4567'
+        address:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: 123 Book Lane, Apt 4B
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Dublin
+        postalCode:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: D02 X285
+        state:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Dublin
+        country:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Ireland
+
+    CheckoutRequest:
+      type: object
+      required: [paymentMethod, address]
+      properties:
+        paymentMethod:
+          type: string
+          enum: [credit_card, debit_card]
+          example: credit_card
+        address:
+          $ref: '#/components/schemas/ShippingAddress'
+
+    OrderItem:
+      type: object
+      required: [book, title, authorName, unitPriceCents, quantity]
+      properties:
+        book:
+          $ref: '#/components/schemas/Book'
+        title:
+          type: string
+          example: The Joy of Minimalism
+        authorName:
+          type: string
+          example: Daniel Reed
+        unitPriceCents:
+          type: integer
+          example: 1999
+        quantity:
+          type: integer
+          example: 1
+
+    Order:
+      type: object
+      required:
+        - id
+        - status
+        - cancellable
+        - confirmedAt
+        - cancelledAt
+        - estimatedDeliveryDate
+        - paymentMethod
+        - paymentStatus
+        - address
+        - items
+        - itemCount
+        - itemsTotalCents
+        - taxIncludedCents
+        - shippingCents
+        - totalCents
+      properties:
+        id:
+          type: integer
+          example: 1042
+        status:
+          type: string
+          enum: [Confirmed, Shipped, Delivered, Cancelled]
+          example: Confirmed
+        cancellable:
+          type: boolean
+          example: true
+        confirmedAt:
+          type: string
+          format: date-time
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+        estimatedDeliveryDate:
+          type: string
+          format: date
+          example: '2025-08-15'
+        paymentMethod:
+          type: string
+          enum: [credit_card, debit_card]
+          example: credit_card
+        paymentStatus:
+          type: string
+          enum: [paid, refunded]
+          example: paid
+        address:
+          $ref: '#/components/schemas/ShippingAddress'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        itemCount:
+          type: integer
+          example: 1
+        itemsTotalCents:
+          type: integer
+          example: 1999
+        taxIncludedCents:
+          type: integer
+          example: 165
+        shippingCents:
+          type: integer
+          example: 0
+        totalCents:
+          type: integer
+          example: 1999
+
+    OrderSummaryItem:
+      type: object
+      required: [bookId, title, coverUrl, quantity]
+      properties:
+        bookId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: The Joy of Minimalism
+        coverUrl:
+          type: string
+          example: /covers/joy-of-minimalism.png
+        quantity:
+          type: integer
+          example: 1
+
+    OrderSummary:
+      type: object
+      required: [id, status, confirmedAt, totalCents, itemCount, items]
+      properties:
+        id:
+          type: integer
+          example: 1042
+        status:
+          type: string
+          enum: [Confirmed, Shipped, Delivered, Cancelled]
+          example: Confirmed
+        confirmedAt:
+          type: string
+          format: date-time
+        totalCents:
+          type: integer
+          example: 1999
+        itemCount:
+          type: integer
+          example: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSummaryItem'
+
+    ErrorDetail:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          example: address.postalCode
+        message:
+          type: string
+          example: Required
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Invalid request data
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+
+  responses:
+    ValidationError:
+      description: Invalid request parameters or payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              error:
+                code: VALIDATION_ERROR
+                message: Invalid request parameters
+                details:
+                  - field: address.postalCode
+                    message: Required
+
+    Unauthenticated:
+      description: Missing, invalid or expired token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              error:
+                code: UNAUTHENTICATED
+                message: Authentication is required to access this resource
+
+    NotFound:
+      description: Resource not found or forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+            example:
+              error:
+                code: NOT_FOUND
+                message: The requested resource was not found
